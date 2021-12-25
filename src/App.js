@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { RgbaColorPicker } from "react-colorful";
+import {useState} from 'react'
+
+ 
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const handleSetColor=   async() =>
+{
+  console.log(color)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify(color)
+};
+ await fetch('http://192.168.0.107:3001/setleds', requestOptions)
+    .then (response=> {
+    return response;
+  })
+
 }
+  const [color, setColor] = useState({ r: 50, g: 100, b: 150 });
+
+  return(
+  <div>
+  <RgbaColorPicker color={color} onChange={setColor} />;
+  <button onClick={handleSetColor}>Näytä Väri</button>
+  </div>
+  )
+};
 
 export default App;
