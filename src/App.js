@@ -12,7 +12,7 @@ function App() {
     headers: { 'Content-Type': 'application/json'},
     body: JSON.stringify(color)
 };
- await fetch('http://192.168.0.107:3001/setleds', requestOptions)
+ await fetch('http://192.168.1.201:3005/setleds', requestOptions)
     .then (response=> {
     return response;
   })
