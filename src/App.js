@@ -4,6 +4,7 @@ import {useState} from 'react'
  
 
 function App() {
+  
   const handleSetColor=   async() =>
 {
   console.log(color)
@@ -18,7 +19,7 @@ function App() {
   })
 
 }
-  const [color, setColor] = useState({ r: 50, g: 100, b: 150 });
+  const [color, setColor] = useState({ r: 0, g: 0, b: 0 });
 
   return(
   <div>
