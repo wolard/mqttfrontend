@@ -5,8 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  width: 500px;
-  height: 500px;
+  width: 400px;
+  height: 300px;
 }
 
 code {
@@ -15,6 +15,12 @@ code {
 }
 #container
 {
+  margin: 5px;
   border: 1px solid black; 
+ 
+}
+#colorpicker
+{
+  margin: 10px;
  
 }
