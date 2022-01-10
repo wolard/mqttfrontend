@@ -96,7 +96,7 @@ function App() {
  
    
   };
-  const initLeds= await fetch('http://localhost:3005/getleds',requestOptions);
+  const initLeds= await fetch('http://localhost:3006/getleds',requestOptions);
  
   let initialLeds= await initLeds.json();
   
