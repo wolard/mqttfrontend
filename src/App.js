@@ -2,6 +2,8 @@ import { useState, useEffect, } from 'react';
 import { Circle, Layer, Stage } from 'react-konva';
 import socketIOClient from "socket.io-client";
 import { RgbaColorPicker } from "react-colorful";
+const apiIp=process.env.REACT_APP_API_IP||'http://docker.lan:3006'
+console.log(apiIp)
 let socket;
 function isIntersect(point, led) {
   return Math.sqrt((point.x-(led.posX)) ** 2 + (point.y - (led.posY)) ** 2) < led.radius+5;
@@ -16,7 +18,8 @@ function ConvertRGBtoHex(red, green, blue) {
   return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 }
 const initiateSocketConnection =  () => {
-  socket = socketIOClient('http://localhost:3006');
+  socket = socketIOClient(apiIp);
+  
   console.log(`Connecting socket...`);
   console.log(socket)
  }
@@ -96,7 +99,8 @@ function App() {
  
    
   };
-  const initLeds= await fetch('http://localhost:3006/getleds',requestOptions);
+  
+  const initLeds= await fetch(apiIp+'/getleds',requestOptions);
  
   let initialLeds= await initLeds.json();
   
