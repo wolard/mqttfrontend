@@ -16,7 +16,7 @@ function ConvertRGBtoHex(red, green, blue) {
   return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
 }
 const initiateSocketConnection =  () => {
-  socket = socketIOClient('http://localhost:3005');
+  socket = socketIOClient('http://localhost:3006');
   console.log(`Connecting socket...`);
   console.log(socket)
  }
