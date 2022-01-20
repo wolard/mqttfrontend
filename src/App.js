@@ -42,6 +42,7 @@ const initiateSocketConnection =  () => {
 }
 function App() {
   const [leds , setLeds] = useState([]);
+  const [effect , setEffect] = useState(0);
   const [color, setColor] = useState({ r: 50, g: 100, b: 150, a:0});
 
 const handleColor=(color)=>{
@@ -54,7 +55,22 @@ console.log(color)
 
 }
   const handleEffect=async()=>{
-    socket.emit("ledwall", "effect1");
+    
+    setEffect(!effect)
+    
+
+  
+    let effe
+    if (effect===false)
+    {
+      effe=0;
+    }
+    else
+    {
+      effe=1
+    }
+console.log(effe)
+    socket.emit("ledwall", effe);
   }
  const handleLedChange= (e)=>{
   // console.log(color)
@@ -62,7 +78,7 @@ console.log(color)
    emitColor.num=parseInt(e.n)
    let newleds=[...leds]
    let currled=newleds.findIndex(x => x.n === e.n);
-   //console.log('led number',e.n)
+   console.log('led number',e.n)
    newleds[currled].r=color.r
    newleds[currled].g=color.g
    newleds[currled].b=color.b
@@ -113,7 +129,7 @@ console.log(color)
 const setColorChange = async ()=> {
 //  console.log(color)
 const rgbArray=leds.map(({r,g,b,a,n})=>({r,g,b,a,n}))
-//console.log('rgbarr',rgbArray)
+console.log('rgbarr',rgbArray)
 const requestOptions = {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
