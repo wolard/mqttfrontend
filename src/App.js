@@ -175,7 +175,7 @@ console.log(resp)
     
     <>
     <div id='container'></div>
-    <Stage container='container' width={400} height={300} onTouchMove={(e)=>handleTouchMove(e)}>
+    <Stage container='container' width={350} height={300} onTouchMove={(e)=>handleTouchMove(e)}>
   
       <Layer>
        
