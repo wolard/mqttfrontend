@@ -1,33 +1,18 @@
 import { useState, useEffect, } from 'react';
-import { Circle, Layer, Stage } from 'react-konva';
+import { Circle, Layer, Stage,Rect } from 'react-konva';
 import socketIOClient from "socket.io-client";
-import { RgbaColorPicker } from "react-colorful";
 const apiIp=process.env.REACT_APP_API_IP||'http://docker.lan:3006'
 console.log(apiIp)
 let socket;
 function isIntersect(point, led) {
-  return Math.sqrt((point.x-(led.posX)) ** 2 + (point.y - (led.posY)) ** 2) < led.radius+5;
+
+  return Math.sqrt((point.x-(led.posX)) ** 2 + (point.y - (led.posY)) ** 2) < led.radius-5;
   
 }
-function rgba2hex(rgba) {
-  rgba = rgba.match(
-    /^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i
-  );
-  return rgba && rgba.length === 4
-    ? "#" +
-        ("0" + parseInt(rgba[1], 10).toString(16)).slice(-2) +
-        ("0" + parseInt(rgba[2], 10).toString(16)).slice(-2) +
-        ("0" + parseInt(rgba[3], 10).toString(16)).slice(-2)
-    : "";
-}
-function ColorToHex(color) {
-  var hexadecimal = color.toString(16);
-  return hexadecimal.length === 1 ? "0" + hexadecimal : hexadecimal;
-}
 
-function ConvertRGBtoHex(red, green, blue) {
-  return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
-}
+
+
+
 const initiateSocketConnection =  () => {
   socket = socketIOClient(apiIp);
   
@@ -43,8 +28,22 @@ const initiateSocketConnection =  () => {
 function App() {
   const [leds , setLeds] = useState([]);
   const [effect , setEffect] = useState(0);
+  const [alpha , setAlpha] = useState(170);
   const [color, setColor] = useState({ r: 50, g: 100, b: 150, a:0});
-
+  const handleSetColor=   async() =>
+{
+  color.a=255-color.a
+  console.log(color)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify(color)
+};
+await fetch(apiIp+'/setallleds',requestOptions)
+    .then (response=> {
+    return response;
+  })
+}
 const handleColor=(color)=>{
 
 
@@ -72,18 +71,37 @@ console.log(color)
 console.log(effe)
     socket.emit("ledwall", effe);
   }
+  const handleLedChangeMouseOver= (id)=>{
+    
+    let emitColor={...color}
+    emitColor.num=parseInt(id)
+    let newleds=[...leds]
+    let currled=newleds.findIndex(x => x.n === id);
+    console.log(currled)
+    newleds[currled].r=color.r
+    newleds[currled].g=color.g
+    newleds[currled].b=color.b
+    newleds[currled].a=color.a
+   
+    setLeds(newleds);
+ 
+   //socket.emit("ledwall", emitColor);
+ 
+ 
+ 
+  }
  const handleLedChange= (e)=>{
-  // console.log(color)
+   //console.log(e)
    let emitColor={...color}
    emitColor.num=parseInt(e.n)
    let newleds=[...leds]
    let currled=newleds.findIndex(x => x.n === e.n);
-   console.log('led number',e.n)
+  // console.log('led number',e.n)
    newleds[currled].r=color.r
    newleds[currled].g=color.g
    newleds[currled].b=color.b
    newleds[currled].a=color.a
-  
+  console.log(newleds[currled])
    setLeds(newleds);
 
   //socket.emit("ledwall", emitColor);
@@ -91,6 +109,12 @@ console.log(effe)
 
 
  }
+ const handleMouseOver= async (e)=>{
+  e.evt.preventDefault()
+  handleLedChangeMouseOver(e.target.attrs.id)
+
+
+}
  const handleTouchMove= async (e)=>{
   e.evt.preventDefault()
   let stage = e.currentTarget;
@@ -102,12 +126,17 @@ console.log(effe)
     x:touchPos.x,
     y:touchPos.y
     }
- 
+   
+  //  console.log('before',pos.x)
+  //  console.log('before',pos.y)
+   pos.y=(pos.y/((window.innerWidth)/100))
+  pos.x=(pos.x/((window.innerWidth)/100))
+
   leds.forEach(led => {
-            
-  
+       
+
     if (isIntersect(pos,led)) {
-     // console.log(led.n)
+      
       handleLedChange(led)
 
 /*
@@ -125,7 +154,34 @@ console.log(effe)
 
 
 }
+const getColMouse =  (e)=> {
+ // console.log(e)
+  let rgb=e.currentTarget
+.getLayer()
+.getContext('2d')
+.getImageData(e.evt.clientX,e.evt.clientY, 1, 1).data
+console.log(rgb[0])
+console.log(rgb[1])
+console.log(rgb[2])
+}
+const getColTouch =  (e)=> {
+ //console.log(e)
+  let rgb=e.target.getLayer()
+  .getContext('2d')
+  .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data //*2 to fix canvas size
 
+  setColor({r:rgb[0],g:rgb[1],b:rgb[2],a:alpha})
+  console.log(rgb)
+  console.log(color)
+}
+const getAlphaTouch =  (e)=> {
+  //console.log(e)
+   let a=e.target.getLayer()
+   .getContext('2d')
+   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data[0] //*2 to fix canvas size
+ console.log(255-a)
+   setAlpha(255-a)
+ }
 const setColorChange = async ()=> {
 //  console.log(color)
 const rgbArray=leds.map(({r,g,b,a,n})=>({r,g,b,a,n}))
@@ -190,32 +246,69 @@ console.log(resp)
    
     
     <>
-    <div id='container'></div>
-    <Stage container='container' width={350} height={300} onTouchMove={(e)=>handleTouchMove(e)}>
-  
+    
+    <Stage width={window.innerWidth} height={window.innerWidth-70} onTouchMove={(e)=>handleTouchMove(e)}>
+    <Layer>
+    <Rect
+          x={(window.innerWidth/100)*10}
+          y={(window.innerWidth/100)*10}
+          width={(window.innerWidth)/100*80}
+          height={(window.innerWidth)/100*15}
+    
+         fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*20}}
+         fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
+      
+         
+         fillLinearGradientColorStops={ [0, 'rgba(255,0,0,'+alpha/255+')', 0.1, 'rgba(255,165,0,'+alpha/255+')',0.2,'rgba(255,255,0,'+alpha/255+')',
+         0.3,'rgba(0,255,0,'+alpha/255+')',0.4,'rgba(0,255,255,'+alpha/255+')'
+        ,0.5,'rgba(0,0,255,'+alpha/255+')',0.6,'rgba(255,0,255,'+alpha/255+')',0.7,'rgba(255,192,203,'+alpha/255+')',
+        0.8,'rgba(255,255,255,'+alpha/255+')',0.9,'rgba(165,42,42,'+alpha/255+')',1,'rgba(0,0,0,'+alpha/255+')']}
+      
+        
+        onTouchStart={getColTouch}
+        onMouseUp={getColMouse}
+    
+        />
+        <Rect
+        
+          x={(window.innerWidth/100)*10}
+          y={(window.innerWidth/100)*30}
+          width={(window.innerWidth)/100*80}
+          height={(window.innerWidth)/100*15}
+    
+         fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*20}}
+         fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
+         
+         
+          fillLinearGradientColorStops={ [0, 'white',1,'black']}
+        
+        onTouchStart={getAlphaTouch}
+        onMouseUp={getColMouse}
+    
+        />
+
+    </Layer>
+
       <Layer>
-       
+      
+      
        
       {leds.map((led) => (
           <Circle
             key={led._id}
             id={led.n}
-            x={led.posX}
-            y={led.posY}
+             x={(((window.innerWidth)/100)*led.posX)}
+            y={(((window.innerWidth)/100)*led.posY)}
             radius={led.radius}
-            fill={rgba2hex('rgba('+led.r+','+led.g+','+led.b+','+led.a+')')}
+            fill={'rgba('+led.r+','+led.g+','+led.b+','+led.a/255+')'}
+            //stroke="black"
             //fill={ConvertRGBtoHex(led.r,led.g,led.b)}
             //fill="#89b717"
             //opacity={0.3}      
             //shadowColor="black"
             //shadowBlur={0}
             //shadowOpacity={0.5}
-            
-            
-            
-           
-           
-     
+            onMouseOver={handleMouseOver}   
            
           />
         ))}
@@ -224,11 +317,12 @@ console.log(resp)
 
     </Stage>
    
-    <div>
-  <RgbaColorPicker color={color} onChange={handleColor} id='colorpicker' />
+ {    <div>
+ 
   <button onClick={setColorChange}>Näytä Väri</button>
   <button onClick={handleEffect}>pyöritä</button>
-  </div>
+  <button onClick={handleSetColor}>värjää</button>
+  </div> }
     </>
   )
 };
