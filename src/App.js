@@ -32,8 +32,19 @@ function App() {
   const [color, setColor] = useState({ r: 50, g: 100, b: 150, a:0});
   const handleSetColor=   async() =>
 {
-  color.a=255-color.a
+ 
   console.log(color)
+  color.a=255-color.a
+  let newleds=[...leds]
+  newleds.forEach(led=>{
+    led.r=color.r
+    led.g=color.g
+    led.b=color.b
+    led.a=color.a
+  })
+setLeds(newleds)
+
+console.log(newleds)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json'},
@@ -254,15 +265,15 @@ console.log(resp)
           y={(window.innerWidth/100)*10}
           width={(window.innerWidth)/100*80}
           height={(window.innerWidth)/100*15}
-    
+        stroke="black"
          fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*20}}
          fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
-      
-         
-         fillLinearGradientColorStops={ [0, 'rgba(255,0,0,'+alpha/255+')', 0.1, 'rgba(255,165,0,'+alpha/255+')',0.2,'rgba(255,255,0,'+alpha/255+')',
-         0.3,'rgba(0,255,0,'+alpha/255+')',0.4,'rgba(0,255,255,'+alpha/255+')'
-        ,0.5,'rgba(0,0,255,'+alpha/255+')',0.6,'rgba(255,0,255,'+alpha/255+')',0.7,'rgba(255,192,203,'+alpha/255+')',
-        0.8,'rgba(255,255,255,'+alpha/255+')',0.9,'rgba(165,42,42,'+alpha/255+')',1,'rgba(0,0,0,'+alpha/255+')']}
+          fillLinearGradientColorStops={ [0, 'rgba(255,0,0,'+alpha/255+')', 
+          0.1, 'rgba(255,165,0,'+alpha/255+')',0.2,'rgba(255,255,0,'+alpha/255+')',
+          0.3,'rgba(0,255,0,'+alpha/255+')',0.4,'rgba(0,255,255,'+alpha/255+')',
+          0.5,'rgba(0,0,255,'+alpha/255+')',0.6,'rgba(255,0,255,'+alpha/255+')',
+          0.7,'rgba(255,192,203,'+alpha/255+')',0.8,'rgba(255,255,255,'+alpha/255+')',
+          0.9,'rgba(165,42,42,'+alpha/255+')',1,'rgba(0,0,0,'+alpha/255+')']}
       
         
         onTouchStart={getColTouch}
@@ -275,7 +286,7 @@ console.log(resp)
           y={(window.innerWidth/100)*30}
           width={(window.innerWidth)/100*80}
           height={(window.innerWidth)/100*15}
-    
+          stroke="black"
          fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*20}}
          fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
          
@@ -317,12 +328,12 @@ console.log(resp)
 
     </Stage>
    
- {    <div>
+     <div id='controls'>
  
   <button onClick={setColorChange}>Näytä Väri</button>
   <button onClick={handleEffect}>pyöritä</button>
   <button onClick={handleSetColor}>värjää</button>
-  </div> }
+  </div> 
     </>
   )
 };

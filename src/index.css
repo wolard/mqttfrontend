@@ -20,8 +20,9 @@ code {
   border: 1px solid black; 
  
 }
-#colorpicker
+
+#controls button
 {
-  margin: 10px;
+  margin: 4px;
  
 }
