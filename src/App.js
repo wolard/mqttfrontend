@@ -27,14 +27,20 @@ const initiateSocketConnection =  () => {
 }
 function App() {
   const [leds , setLeds] = useState([]);
+  const [sleds , setSleds] = useState([]);
   const [effect , setEffect] = useState(0);
-  const [alpha , setAlpha] = useState(170);
-  const [color, setColor] = useState({ r: 50, g: 100, b: 150, a:0});
+  const [rgba , setRgba] = useState('rgba(128,128,128,0.5)');
+  const [color, setColor] = useState({ r: 0, g: 0, b: 0, a:128});
+  
+ 
+ 
   const handleSetColor=   async() =>
 {
  
-  console.log(color)
-  color.a=255-color.a
+  console.log('colorbefore',color)
+  const sendcolor={...color}
+  sendcolor.a=255-color.a
+  console.log('colorafter',color)
   let newleds=[...leds]
   newleds.forEach(led=>{
     led.r=color.r
@@ -48,7 +54,7 @@ console.log(newleds)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify(color)
+    body: JSON.stringify(sendcolor)
 };
 await fetch(apiIp+'/setallleds',requestOptions)
     .then (response=> {
@@ -102,17 +108,17 @@ console.log(effe)
  
   }
  const handleLedChange= (e)=>{
-   //console.log(e)
+   console.log(e.attrs.id)
    let emitColor={...color}
-   emitColor.num=parseInt(e.n)
+   emitColor.num=parseInt(e.id)
    let newleds=[...leds]
-   let currled=newleds.findIndex(x => x.n === e.n);
+   let currled=newleds.findIndex(x => x.n === e.attrs.id);
   // console.log('led number',e.n)
    newleds[currled].r=color.r
    newleds[currled].g=color.g
    newleds[currled].b=color.b
    newleds[currled].a=color.a
-  console.log(newleds[currled])
+
    setLeds(newleds);
 
   //socket.emit("ledwall", emitColor);
@@ -126,8 +132,17 @@ console.log(effe)
 
 
 }
+const handleTouchMove2= async (e)=>{
+  e.evt.preventDefault()
+  
+  let circle = e.target;
+  console.log(circle)
+  handleLedChange(circle)
+
+}
  const handleTouchMove= async (e)=>{
   e.evt.preventDefault()
+  
   let stage = e.currentTarget;
   
   let touchPos = stage.getPointerPosition();
@@ -143,7 +158,9 @@ console.log(effe)
    pos.y=(pos.y/((window.innerWidth)/100))
   pos.x=(pos.x/((window.innerWidth)/100))
 
-  leds.forEach(led => {
+//console.log('shortconcretewallleds',sleds)
+
+  sleds.forEach(led => {
        
 
     if (isIntersect(pos,led)) {
@@ -177,21 +194,38 @@ console.log(rgb[2])
 }
 const getColTouch =  (e)=> {
  //console.log(e)
-  let rgb=e.target.getLayer()
+  const rgb=e.target.getLayer()
   .getContext('2d')
   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data //*2 to fix canvas size
+   console.log(rgb)
+  const newCol=color
+  newCol.r=rgb[0]
+  newCol.g=rgb[1]
+  newCol.b=rgb[2]
+  // setColor({r:rgb[0],g:rgb[1],b:rgb[2],a:color.a})
+  setColor(newCol)
+  const rgbaCol='rgba('+newCol.r+','+newCol.g+','+newCol.b+','+newCol.a/255+')'
+  setRgba(rgbaCol)
 
-  setColor({r:rgb[0],g:rgb[1],b:rgb[2],a:alpha})
-  console.log(rgb)
-  console.log(color)
+console.log(color)
 }
-const getAlphaTouch =  (e)=> {
+const getColAlpha  =  (e)=> {
   //console.log(e)
    let a=e.target.getLayer()
    .getContext('2d')
    .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data[0] //*2 to fix canvas size
- console.log(255-a)
-   setAlpha(255-a)
+   
+   const newCol=color
+   newCol.a=a
+  setColor(newCol)
+   const rgbaCol='rgba('+newCol.r+','+newCol.g+','+newCol.b+','+(1-newCol.a/255)+')'
+  setRgba(rgbaCol)
+
+
+   
+  
+
+   console.log(color)
  }
 const setColorChange = async ()=> {
 //  console.log(color)
@@ -226,8 +260,10 @@ console.log(resp)
   const initLeds= await fetch(apiIp+'/getleds',requestOptions);
  
   let initialLeds= await initLeds.json();
-  
+  const sleds=initialLeds.filter(led=>led.name==='shortconcretewall')
   setLeds(initialLeds)
+  setSleds(sleds)
+  console.log(sleds)
   console.log(initialLeds)
 
 } 
@@ -246,11 +282,14 @@ console.log(resp)
    
    }
 },[]
-  
+
   
   
   
   )
+
+
+  
  // console.log('leds',leds)
  
   return(
@@ -258,7 +297,7 @@ console.log(resp)
     
     <>
     
-    <Stage width={window.innerWidth} height={window.innerWidth-70} onTouchMove={(e)=>handleTouchMove(e)}>
+    <Stage  width={window.innerWidth} height={window.innerWidth-70} >
     <Layer>
     <Rect
           x={(window.innerWidth/100)*10}
@@ -268,12 +307,12 @@ console.log(resp)
         stroke="black"
          fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*20}}
          fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
-          fillLinearGradientColorStops={ [0, 'rgba(255,0,0,'+alpha/255+')', 
-          0.1, 'rgba(255,165,0,'+alpha/255+')',0.2,'rgba(255,255,0,'+alpha/255+')',
-          0.3,'rgba(0,255,0,'+alpha/255+')',0.4,'rgba(0,255,255,'+alpha/255+')',
-          0.5,'rgba(0,0,255,'+alpha/255+')',0.6,'rgba(255,0,255,'+alpha/255+')',
-          0.7,'rgba(255,192,203,'+alpha/255+')',0.8,'rgba(255,255,255,'+alpha/255+')',
-          0.9,'rgba(165,42,42,'+alpha/255+')',1,'rgba(0,0,0,'+alpha/255+')']}
+          fillLinearGradientColorStops={ [0, 'rgba(255,0,0,'+(1-color.a/255)+')', 
+          0.1, 'rgba(255,165,0,'+(1-color.a/255)+')',0.2,'rgba(255,255,0,'+(1-color.a/255)+')',
+          0.3,'rgba(0,255,0,'+(1-color.a/255)+')',0.4,'rgba(0,255,255,'+(1-color.a/255)+')',
+          0.5,'rgba(0,0,255,'+(1-color.a/255)+')',0.6,'rgba(255,0,255,'+(1-color.a/255)+')',
+          0.7,'rgba(255,192,203,'+(1-color.a/255)+')',0.8,'rgba(255,255,255,'+(1-color.a/255)+')',
+          0.9,'rgba(165,42,42,'+(1-color.a/255)+')',1,'rgba(0,0,0,'+(1-color.a/255)+')']}
       
         
         onTouchStart={getColTouch}
@@ -293,14 +332,25 @@ console.log(resp)
          
           fillLinearGradientColorStops={ [0, 'white',1,'black']}
         
-        onTouchStart={getAlphaTouch}
+        onTouchStart={getColAlpha}
         onMouseUp={getColMouse}
     
         />
-
+   <Rect
+        
+        x={(window.innerWidth/100)*70}
+        y={(window.innerWidth/100)*50}
+        width={(window.innerWidth)/100*15}
+        height={(window.innerWidth)/100*15}
+        stroke="black"
+        //fill={rgba}    
+        fill={'rgba('+color.r+','+color.g+','+color.b+','+(1-color.a/255)+')'}
+  
+  
+      />
     </Layer>
 
-      <Layer>
+      <Layer onTouchMove={handleTouchMove2}>
       
       
        
@@ -311,7 +361,7 @@ console.log(resp)
              x={(((window.innerWidth)/100)*led.posX)}
             y={(((window.innerWidth)/100)*led.posY)}
             radius={led.radius}
-            fill={'rgba('+led.r+','+led.g+','+led.b+','+led.a/255+')'}
+            fill={'rgba('+led.r+','+led.g+','+led.b+','+(1-led.a/255)+')'}
             //stroke="black"
             //fill={ConvertRGBtoHex(led.r,led.g,led.b)}
             //fill="#89b717"
