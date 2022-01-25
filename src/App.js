@@ -20,7 +20,7 @@ const initiateSocketConnection =  () => {
   console.log(socket)
  }
 
-
+ let pickcolor
  const disconnectSocket = () => {
   console.log('Disconnecting socket...');
   if(socket) socket.disconnect();
@@ -29,8 +29,7 @@ function App() {
   const [leds , setLeds] = useState([]);
   const [sleds , setSleds] = useState([]);
   const [effect , setEffect] = useState(0);
-  const [rgba , setRgba] = useState('rgba(128,128,128,0.5)');
-  const [color, setColor] = useState({ r: 0, g: 0, b: 0, a:128});
+  const [color, setColor] = useState({ r: 128, g: 128, b: 128, a:128});
   
  
  
@@ -198,28 +197,38 @@ const getColTouch =  (e)=> {
   .getContext('2d')
   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data //*2 to fix canvas size
    console.log(rgb)
-  const newCol=color
+   console.log(color)
+   
+  
+  
+ 
+  let newCol={...color}
   newCol.r=rgb[0]
   newCol.g=rgb[1]
   newCol.b=rgb[2]
-  // setColor({r:rgb[0],g:rgb[1],b:rgb[2],a:color.a})
-  setColor(newCol)
-  const rgbaCol='rgba('+newCol.r+','+newCol.g+','+newCol.b+','+newCol.a/255+')'
-  setRgba(rgbaCol)
 
-console.log(color)
+  // setColor({r:rgb[0],g:rgb[1],b:rgb[2],a:rgb[3]})
+  
+  setColor(newCol)
+  console.log(color)
+  //const rgbaCol='rgba('+newCol.r+','+newCol.g+','+newCol.b+','+newCol.a/255+')'
+  
+
+
 }
 const getColAlpha  =  (e)=> {
   //console.log(e)
    let a=e.target.getLayer()
    .getContext('2d')
-   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data[0] //*2 to fix canvas size
-   
-   const newCol=color
-   newCol.a=a
-  setColor(newCol)
-   const rgbaCol='rgba('+newCol.r+','+newCol.g+','+newCol.b+','+(1-newCol.a/255)+')'
-  setRgba(rgbaCol)
+   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data[3] //*2 to fix canvas size
+   console.log('oldalpha',color)
+   let newCol={...color}
+   newCol.a=255-a
+ setColor(newCol)
+  
+  console.log('newalpha',color)
+  // const rgbaCol='rgba('+color.r+','+color.g+','+color.b+','+(color.a/255)+')'
+  //setRgba(rgbaCol)
 
 
    
@@ -288,7 +297,7 @@ console.log(resp)
   
   )
 
-
+  
   
  // console.log('leds',leds)
  
@@ -330,7 +339,8 @@ console.log(resp)
          fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*20 }}
          
          
-          fillLinearGradientColorStops={ [0, 'white',1,'black']}
+          fillLinearGradientColorStops={ [0, 'rgba('+color.r+','+color.g+','+color.b+',0)',
+          1,'rgba('+color.r+','+color.g+','+color.b+',1)']}
         
         onTouchStart={getColAlpha}
         onMouseUp={getColMouse}
@@ -345,7 +355,7 @@ console.log(resp)
         stroke="black"
         //fill={rgba}    
         fill={'rgba('+color.r+','+color.g+','+color.b+','+(1-color.a/255)+')'}
-  
+      
   
       />
     </Layer>
@@ -361,6 +371,7 @@ console.log(resp)
              x={(((window.innerWidth)/100)*led.posX)}
             y={(((window.innerWidth)/100)*led.posY)}
             radius={led.radius}
+            
             fill={'rgba('+led.r+','+led.g+','+led.b+','+(1-led.a/255)+')'}
             //stroke="black"
             //fill={ConvertRGBtoHex(led.r,led.g,led.b)}
