@@ -244,7 +244,7 @@ const getColAlpha  =  (e)=> {
    newCol.b=data[2]
    newCol.a=255-data[3]
  setPickColor(newCol)
-  handleSetColor()
+  
   console.log('pickcolor',pickColor)
     return newCol
 
@@ -336,45 +336,45 @@ console.log(resp)
           0.7,'rgba(255,192,203,1)',0.8,'rgba(255,255,255,1)',
           0.9,'rgba(165,42,42,1)',1,'rgba(0,0,0,1)']}
       
-        
+         
         onTouchStart={getColTouch}
         onMouseUp={getColMouse}
     
         />
   <Rect
         
-        x={(window.innerWidth/100)*10}
+        x={(window.innerWidth/100)*20}
         y={(window.innerWidth/100)*30}
-        width={(window.innerWidth)/100*80}
-        height={(window.innerWidth)/100*15}
+        width={(window.innerWidth)/100*35}
+        height={(window.innerWidth)/100*35}
         stroke="black"
        fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)}}
-       fillLinearGradientEndPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*15 }}
+       fillLinearGradientEndPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*35 }}
        
        
       fillLinearGradientColorStops={ [0, 'rgba(0,0,0,0)',1,'rgba(0,0,0,1)']}
       
-      onTouchStart={getColAlpha}
       onMouseUp={getColMouse}
   
       />      
         <Rect
         
-          x={(window.innerWidth/100)*10}
+          x={(window.innerWidth/100)*20}
           y={(window.innerWidth/100)*30}
-          width={(window.innerWidth)/100*80}
-          height={(window.innerWidth)/100*15}
+          width={(window.innerWidth)/100*35}
+          height={(window.innerWidth)/100*35}
           stroke="black"
         
-          fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*15}}
-         fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*80, y: (window.innerWidth/100)*15 }}
+          fillLinearGradientStartPoint= {{ x: (window.innerWidth/100), y: (window.innerWidth/100)*35}}
+         fillLinearGradientEndPoint= {{ x: (window.innerWidth/100)*35, y: (window.innerWidth/100)*35 }}
          
          
           fillLinearGradientColorStops={ [0, 'rgba('+color.r+','+color.g+','+color.b+',0)',
           1,'rgba('+color.r+','+color.g+','+color.b+',1)']}
         
-        onTouchMove={getColAlpha}
-        onTouchStart={getColAlpha}
+      
+          onTouchMove={getColAlpha}
+          onTouchStart={getColAlpha}
         onMouseUp={getColMouse}
     
         />
@@ -387,7 +387,7 @@ console.log(resp)
         stroke="black"
         //fill={rgba}    
         fill={'rgba('+pickColor.r+','+pickColor.g+','+pickColor.b+','+(1-pickColor.a/255)+')'}
-      
+        onTouchStart={handleSetColor}
   
       />
       </Layer>
