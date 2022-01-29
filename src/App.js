@@ -4,6 +4,7 @@ import socketIOClient from "socket.io-client";
 const apiIp=process.env.REACT_APP_API_IP||'http://docker.lan:3006'
 console.log(apiIp)
 let socket;
+let tempLeds=[]
 function isIntersect(point, led) {
 
   return Math.sqrt((point.x-(led.posX)) ** 2 + (point.y - (led.posY)) ** 2) < led.radius-5;
@@ -40,7 +41,8 @@ const initiateSocketConnection =  () => {
 }
 function App() {
   const [leds , setLeds] = useState([]);
-  const [sleds , setSleds] = useState([]);
+ // const [tempLeds , setTempLeds] = useState([]);
+  const[alarm,setAlarn]=useState(false)
   const [effect , setEffect] = useState(0);
   const [color, setColor] = useState({ r: 128, g: 128, b: 128, a:128});
   const [pickColor, setPickColor] = useState({ r: 128, g: 128, b: 128, a:128});
@@ -137,10 +139,74 @@ console.log(effe)
    setLeds(newleds);
 
   //socket.emit("ledwall", emitColor);
+}
+const handleKukkaAlarm = ()=>{
+  console.log('newleds',leds)
+  let al =!alarm
+  setAlarn(!alarm)
+  console.log(alarm)
+
+ 
+  
+  if (al)
+  {
+    tempLeds=leds.map(({r,g,b,a,n})=>({r,g,b,a,n}))
+
+    console.log('alarm set')
+  let newLeds=[...leds]   //4 red, 4 white
+  
+   console.log('templeds',tempLeds)
+
+let r=0
+let red=1
+for (let i=0;i<newLeds.length;i++)
+{
 
 
+if (r>3){
+red=!red
+r=0
+}
+if (!red)
+{
+  newLeds[i].r=255
+  newLeds[i].g=0
+  newLeds[i].b=0
+  newLeds[i].a=0
+}
+else
+{
+  newLeds[i].r=255
+  newLeds[i].g=255
+  newLeds[i].b=255
+  newLeds[i].a=1
+}
+r++
+}
+setLeds(newLeds)
 
- }
+
+setColorChange()
+handleEffect()
+  }
+  else
+  {
+   console.log('alarm off')
+   let originleds=[...leds]
+   console.log('set old leds back',originleds)
+   originleds.forEach((l,i)=>{
+     l.r=tempLeds[i].r
+     l.g=tempLeds[i].g
+     l.b=tempLeds[i].b
+     l.a=tempLeds[i].a
+   })
+   console.log('originleds',originleds)
+   setLeds(originleds)
+   
+    setColorChange()
+    handleEffect()
+  }
+}
  const handleMouseOver= async (e)=>{
   e.evt.preventDefault()
   handleLedChangeMouseOver(e.target.attrs.id)
@@ -155,48 +221,7 @@ const handleTouchMove2= async (e)=>{
   handleLedChange(circle)
 
 }
- const handleTouchMove= async (e)=>{
-  e.evt.preventDefault()
-  
-  let stage = e.currentTarget;
-  
-  let touchPos = stage.getPointerPosition();
-  
-  const pos={
-            
-    x:touchPos.x,
-    y:touchPos.y
-    }
-   
-  //  console.log('before',pos.x)
-  //  console.log('before',pos.y)
-   pos.y=(pos.y/((window.innerWidth)/100))
-  pos.x=(pos.x/((window.innerWidth)/100))
 
-//console.log('shortconcretewallleds',sleds)
-
-  sleds.forEach(led => {
-       
-
-    if (isIntersect(pos,led)) {
-      
-      handleLedChange(led)
-
-/*
-      if(rgbColor!==led.color)
-      {
-        led.color=rgbColor
-        handleChangeLed(rgbColor,led.num,ctx,x,y)
-      
-        
-        //console.log('change color',led.num
-  }
-  */   
-    }
-  });
-
-
-}
 const getColMouse =  (e)=> {
  // console.log(e)
   let rgb=e.currentTarget
@@ -250,7 +275,7 @@ const getColAlpha  =  (e)=> {
 
  }
 const setColorChange = async ()=> {
-//  console.log(color)
+  console.log('leds on colorchange',leds)
 const rgbArray=leds.map(({r,g,b,a,n})=>({r,g,b,a,n}))
 console.log('rgbarr',rgbArray)
 const requestOptions = {
@@ -282,11 +307,8 @@ console.log(resp)
   const initLeds= await fetch(apiIp+'/getleds',requestOptions);
  
   let initialLeds= await initLeds.json();
-  const sleds=initialLeds.filter(led=>led.name==='shortconcretewall')
   setLeds(initialLeds)
-  setSleds(sleds)
-  console.log(sleds)
-  console.log(initialLeds)
+   console.log(initialLeds)
 
 } 
 
@@ -451,6 +473,7 @@ console.log(resp)
  
   <button onClick={setColorChange}>Näytä Väri</button>
   <button onClick={handleEffect}>pyöritä</button>
+  <button onClick={handleKukkaAlarm}>kukkahälytys</button>
  
   </div> 
     </>
