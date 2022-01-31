@@ -341,11 +341,11 @@ console.log(resp)
     
     <>
     
-    <Stage  width={window.innerWidth} height={window.innerWidth-70} >
+    <Stage  width={window.innerWidth} height={window.innerWidth-1} >
     <Layer name='gradients'>
     <Rect
           x={(window.innerWidth/100)*10}
-          y={(window.innerWidth/100)*10}
+          y={(window.innerWidth/100)*30}
           width={(window.innerWidth)/100*80}
           height={(window.innerWidth)/100*15}
         stroke="black"
@@ -366,7 +366,7 @@ console.log(resp)
   <Rect
         
         x={(window.innerWidth/100)*20}
-        y={(window.innerWidth/100)*30}
+        y={(window.innerWidth/100)*50}
         width={(window.innerWidth)/100*35}
         height={(window.innerWidth)/100*35}
         stroke="black"
@@ -382,7 +382,7 @@ console.log(resp)
         <Rect
         
           x={(window.innerWidth/100)*20}
-          y={(window.innerWidth/100)*30}
+          y={(window.innerWidth/100)*50}
           width={(window.innerWidth)/100*35}
           height={(window.innerWidth)/100*35}
           stroke="black"
@@ -392,6 +392,10 @@ console.log(resp)
          
          
           fillLinearGradientColorStops={ [0, 'rgba('+color.r+','+color.g+','+color.b+',0)',
+          0.2, 'rgba('+color.r+','+color.g+','+color.b+',0.2)',
+          0.4, 'rgba('+color.r+','+color.g+','+color.b+',0.4)',
+          0.6, 'rgba('+color.r+','+color.g+','+color.b+',0.8)',
+          0.8, 'rgba('+color.r+','+color.g+','+color.b+',1)',
           1,'rgba('+color.r+','+color.g+','+color.b+',1)']}
         
       
@@ -403,7 +407,7 @@ console.log(resp)
    <Rect
         
         x={(window.innerWidth/100)*70}
-        y={(window.innerWidth/100)*50}
+        y={(window.innerWidth/100)*70}
         width={(window.innerWidth)/100*15}
         height={(window.innerWidth)/100*15}
         stroke="black"
