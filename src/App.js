@@ -478,7 +478,8 @@ console.log(resp)
   <button onClick={setColorChange}>Näytä Väri</button>
   <button onClick={handleEffect}>pyöritä</button>
   <button onClick={handleKukkaAlarm}>kukkahälytys</button>
- 
+  <button onClick={()=>socket.emit("colorAll",{r:255,g:255,b:255,a:255})}>täysi valaistus</button>
+  <button onClick={()=>socket.emit("colorAll",{r:0,g:0,b:0,a:0})}>valot pois</button>
   </div> 
     </>
   )
