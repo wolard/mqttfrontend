@@ -57,15 +57,17 @@ function App() {
   sendcolor.a=255-pickColor.a
   let newleds=[...leds]
   newleds.forEach(led=>{
+                //set number to -1 to handle all colors
     led.r=pickColor.r
     led.g=pickColor.g
     led.b=pickColor.b
     led.a=pickColor.a
   })
+ 
 setLeds(newleds)
 
 console.log(newleds)
-socket.emit("colorAll",pickColor)
+socket.emit("colorAll",{n:-1,r:pickColor.r,g:pickColor.g,b:pickColor.b,a:pickColor.a})
 /* 
 const requestOptions = {
     method: 'POST',
@@ -126,15 +128,13 @@ console.log(effe)
   }
  const handleLedChange= (e)=>{
    console.log(e.attrs.id)
-   let emitColor={...color}
-   emitColor.num=parseInt(e.id)
-   let newleds=[...leds]
+    let newleds=[...leds]
    let currled=newleds.findIndex(x => x.n === e.attrs.id);
   // console.log('led number',e.n)
-   newleds[currled].r=color.r
-   newleds[currled].g=color.g
-   newleds[currled].b=color.b
-   newleds[currled].a=color.a
+   newleds[currled].r=pickColor.r
+   newleds[currled].g=pickColor.g
+   newleds[currled].b=pickColor.b
+   newleds[currled].a=pickColor.a
 
    setLeds(newleds);
 
@@ -278,20 +278,7 @@ const setColorChange = async ()=> {
   console.log('leds on colorchange',leds)
 const rgbArray=leds.map(({r,g,b,a,n})=>({r,g,b,a,n}))
 console.log('rgbarr',rgbArray)
-const requestOptions = {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({rgbArray})
-
-
-};
-
-const response= await fetch(apiIp+'/setleds',requestOptions);
-const resp=await response
-console.log(resp)
-
-
-
+socket.emit("colorSelected",rgbArray)
 
 
 }
@@ -341,7 +328,7 @@ console.log(resp)
     
     <>
     
-    <Stage  width={window.innerWidth} height={window.innerWidth-1} >
+    <Stage  width={window.innerWidth} height={window.innerWidth-1} >      
     <Layer name='gradients'>
     <Rect
           x={(window.innerWidth/100)*10}
@@ -479,7 +466,7 @@ console.log(resp)
   <button onClick={handleEffect}>pyöritä</button>
   <button onClick={handleKukkaAlarm}>kukkahälytys</button>
   <button onClick={()=>socket.emit("colorAll",{r:255,g:255,b:255,a:255})}>täysi valaistus</button>
-  <button onClick={()=>socket.emit("colorAll",{r:0,g:0,b:0,a:0})}>valot pois</button>
+  <button onClick={()=>socket.emit("colorAll",{r:50,g:0,b:0,a:0})}>valot pois</button>
   </div> 
     </>
   )
