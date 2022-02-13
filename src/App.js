@@ -90,13 +90,10 @@ console.log(color)
 
 }
   const handleEffect=async()=>{
-    
-    setEffect(!effect)
-    
-
-  
     let effe
-    if (effect===false)
+    effe=!effe
+    setEffect(!effe) 
+    if (effe===false)
     {
       effe=0;
     }
@@ -465,8 +462,8 @@ socket.emit("colorSelected",rgbArray)
   <button onClick={setColorChange}>Näytä Väri</button>
   <button onClick={handleEffect}>pyöritä</button>
   <button onClick={handleKukkaAlarm}>kukkahälytys</button>
-  <button onClick={()=>socket.emit("colorAll",{r:255,g:255,b:255,a:255})}>täysi valaistus</button>
-  <button onClick={()=>socket.emit("colorAll",{r:50,g:0,b:0,a:0})}>valot pois</button>
+  <button onClick={()=>socket.emit("fullLight",1)}>täysi valaistus</button>
+  <button onClick={()=>socket.emit("fullLight",0)}>valot pois</button>
   </div> 
     </>
   )
