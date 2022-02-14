@@ -230,11 +230,12 @@ console.log(rgb[1])
 console.log(rgb[2])
 }
 const getColTouch =  (e)=> {
- //console.log(e)
+ console.log(e)
   const rgb=e.target.getLayer()
   .getContext('2d')
-  .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data //*2 to fix canvas size
-   console.log(rgb)
+ .getImageData(e.evt.changedTouches[0].pageX*(e.currentTarget.parent.canvas.pixelRatio),e.evt.changedTouches[0].pageY*(e.currentTarget.parent.canvas.pixelRatio), 1, 1).data 
+ 
+ console.log(rgb)
    console.log(color)
    
   
