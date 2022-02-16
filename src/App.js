@@ -259,7 +259,7 @@ const getColAlpha  =  (e)=> {
   //console.log(e)
    let data=e.target.getLayer()
    .getContext('2d')
-   .getImageData(e.evt.changedTouches[0].pageX*2,e.evt.changedTouches[0].pageY*2, 1, 1).data //*2 to fix canvas size
+   .getImageData(e.evt.changedTouches[0].pageX*(e.currentTarget.parent.canvas.pixelRatio),e.evt.changedTouches[0].pageY*(e.currentTarget.parent.canvas.pixelRatio), 1, 1).data //*2 to fix canvas size
  
    let newCol={...pickColor}
    newCol.r=data[0]
@@ -267,7 +267,16 @@ const getColAlpha  =  (e)=> {
    newCol.b=data[2]
    newCol.a=255-data[3]
  setPickColor(newCol)
-  
+ socket.emit("colorAll",{n:-1,r:newCol.r,g:newCol.g,b:newCol.b,a:newCol.a})
+ let newleds=[...leds]
+ newleds.forEach(led=>{
+               //set number to -1 to handle all colors
+   led.r=data[0]
+   led.g=data[1]
+   led.b=data[2]
+   led.a=255-data[3]
+ })
+ setLeds(newleds)
   console.log('pickcolor',pickColor)
     return newCol
 
